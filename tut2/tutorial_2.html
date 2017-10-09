@@ -229,6 +229,12 @@ with the additional flag: –allow-file-access-from-files
 		//Change tranform to apply the correct rotation and translations transformations in the right order
 		var transform = createMat4();
 
+    var trans = translate(pos[0], pos[1], pos[2]);
+    transform = multiplyMat4(trans, R);
+
+    var transback = translate(-pos[0], -pos[1], -pos[2]);
+    transform = multiplyMat4(transform, transback);
+
 		return multiplyMat4(transform, m);
 	}
 
