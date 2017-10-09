@@ -1,0 +1,449 @@
+<!doctype html>
+<html>
+
+<!--
+If running using Google Chrome, open the browser via the command line
+with the additional flag: –allow-file-access-from-files
+-->
+
+  <head>
+    <title>Computer Graphics Tutorial 2</title>
+
+	<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="maths_utils.js"></script>
+
+<!-- #########################################################---
+                            Shaders
+-----######################################################### -->
+
+
+	<!-- The vertex shader that performs coordinate transformations, and projects the 3D to 2D coordinates.-->
+    <script type="x-shader/x-vertex" id="vertex-shader">
+    precision mediump float;
+
+	//Attributes are different for each vertex.
+	//This represents the vertex's 3D position in model space.
+    attribute vec3 pos;
+
+	//Uniform variables are the same across all invocations of a shader
+	//so each vertex will get the same set of transformation matrices:
+	uniform mat4 modelMatrix;
+	uniform mat4 viewMatrix;
+    uniform mat4 projectionMatrix;
+
+	//The transformed vertex coordinates are passed on to the next stage of the graphics pipeline.
+    void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1.0);
+    }
+    </script>
+
+
+	<!-- This simple fragment shader makes every pixel it receives red.-->
+    <script type="x-shader/x-fragment" id="fragment-shader">
+    precision mediump float;
+
+	//Output the colour red as an RGBA vector
+    void main() {
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+    </script>
+
+
+
+    <script type="text/javascript">
+
+
+/////#########################################################
+/////                Functions to Implement
+/////#########################################################
+
+	/**
+	* Loads in the vertices of a 3D mesh from the string
+	* contents of a ".OBJ" file.
+	*
+	* @param {string} The contents of an OBJ file.
+	*/
+	function loadMeshData(string) {
+		var lines = string.split("\n");
+		var vertices = [];
+    var tvertices = [];
+
+    for (var i = 0; i < lines.length; i++) {
+      var cline = lines[i];
+      if (cline[0] === 'v') { // vertices are set first
+        sverts = cline.split(" ");
+        tvertices.push([parseFloat(sverts[1]), parseFloat(sverts[2]), parseFloat(sverts[3])]);
+      }
+
+      if (cline[0] === 'f') { // at this point all vertices have been set
+        iverts = cline.split(" ");
+        for(var j = 1; j < iverts.length; j++) {
+          ivert = parseInt(iverts[j]) - 1;
+          cvert = tvertices[ivert];
+          vertices.push(cvert[0]);
+          vertices.push(cvert[1]);
+          vertices.push(cvert[2]);
+        }
+      }
+    }
+
+// Question 1:
+// Fill in the "vertices" array with the contents of the .OBJ file
+
+
+
+
+		var message = "Loaded mesh with " + (vertices.length / 3) + " vertices";
+		console.log(message);
+		$("div#message_area").text(message);
+		return {
+			primitiveType: 'TRIANGLES',
+			vertices: new Float32Array(vertices),
+			vertexCount: vertices.length / 3,
+		};
+    }
+
+
+	/**
+	* Returns a perspective projection matrix
+	*
+	* @param {fovy} the y field of view (in radians)
+	* @param {aspect} the aspect ratio of the display (width/height)
+	* @param {n} distance to the near clip-plane
+	* @param {f} distance to the far clip-plane
+	*/
+	function perspective(fovy, aspect, n, f) {
+		var t = n * Math.tan(fovy / 2);
+		var r = t * aspect;
+
+		var out = createMat4();
+
+    // var persp = [n/r, 0,    0,                  0,
+    //             0,    n/t,  0,                  0,
+    //             0,    0,    (-(f + n)/(f - n)), ((-2*f*n)/(f -n)),
+    //             0,    0,    -1,                 0];
+
+    var persp = [n/r, 0,    0,                    0,
+                0,    n/t,  0,                    0,
+                0,    0,    (-(f + n)/(f - n)),   -1,
+                0,    0,    ((-2*f*n)/(f -n)),    0];
+    var out = arrayToMat4(persp);
+
+ // Question 2:
+ // Fill in this function to return the correct perspective projection matrix
+ // The createMat4() or arrayToMat4(a) functions will help keep the array in the correct format.
+
+		return out;
+	}
+
+
+	//Return a translation matrix
+	function translate(x, y, z) {
+
+		var out = createMat4();
+
+    var trans = [1, 0, 0, 0,
+                 0, 1, 0, 0,
+                 0, 0, 1, 0,
+                 x, y, z, 1];
+
+    var out = arrayToMat4(trans);
+
+// Question 3:
+// Fill in this function to return a matrix that translates vectors by the given (x,y,z) amounts.
+// The createMat4() or arrayToMat4(a) functions will help keep the array in the correct format.
+
+		return out;
+	}
+
+
+// Question 4:
+// Fill in these rotation functions to return matrices that rotate around the correct axes:
+
+	function rotateX(theta) {
+		var s = Math.sin(theta);
+		var c = Math.cos(theta);
+		var out = createMat4();
+
+		//Fill in here:
+
+    var rot = [
+      1, 0, 0, 0,
+      0, c, s, 0,
+      0, -s, c, 0,
+      0, 0, 0, 1
+    ];
+
+    var out = arrayToMat4(rot);
+
+		return out;
+
+	}
+
+	function rotateY(theta) {
+    var s = Math.sin(theta);
+		var c = Math.cos(theta);
+		var out = createMat4();
+
+		//Fill in here:
+
+    var rot = [
+      c, 0, s, 0,
+      0, 1, 0, 0,
+      -s, 0, c, 0,
+      0, 0, 0, 1
+    ];
+
+    var out = arrayToMat4(rot);
+
+		return out;
+	}
+
+	function rotateZ(theta) {
+    var s = Math.sin(theta);
+		var c = Math.cos(theta);
+		var out = createMat4();
+
+		//Fill in here:
+    var rot = [
+      c, s, 0, 0,
+      -s, c, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1
+    ];
+
+    var out = arrayToMat4(rot);
+
+		return out;
+	}
+
+// Question 5:
+// Fill in this function so that it translates the cube to the origin,
+// rotates it around the correct axes, and then translates it back to its original position:
+
+	//Apply a rotation around the origin point to the given matrix
+	function applyXYZRotationTo(m, thetaX, thetaY, thetaZ){
+		var pos = getPositionFromMat4(m);
+		var R = rotateXYZ(thetaX, thetaY, thetaZ);
+
+		//Change tranform to apply the correct rotation and translations transformations in the right order
+		var transform = createMat4();
+
+		return multiplyMat4(transform, m);
+	}
+
+	function getPositionFromMat4(m) {
+		return [m[12], m[13], m[14]];
+	}
+
+	function rotateXYZ(thetaX, thetaY, thetaZ) {
+		var RX = rotateX(thetaX);
+		var RY = rotateY(thetaY);
+		var RZ = rotateZ(thetaZ);
+		return multiplyMat4(RX, multiplyMat4(RY, RZ));
+	}
+
+/////#########################################################
+/////           Other Rendering and Boilerplate Code
+/////#########################################################
+
+    $(document).ready(function() {
+      loadMesh('cube.obj')
+    });
+
+	//Called repeatedly to refresh the screen and respond to input
+	function render(gl,scene,timestamp,previousTimestamp) {
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		//Start using our vertex and fragment shaders
+		gl.useProgram(scene.program);
+
+		//Time delta for animation
+		var delta = (0.125 * Math.PI) / (timestamp - previousTimestamp);
+
+
+
+		//Move the cube's position at the given speed
+		var moveX = ($('#cam-x').val());
+		var moveY = ($('#cam-y').val());
+		var moveZ = ($('#cam-z').val());
+
+		var transform = translate(moveX, moveY, moveZ);
+		scene.object.modelMatrix = multiplyMat4(transform, scene.object.modelMatrix);
+
+
+
+		//Rotate the cube using the slider values
+		var rotateX = ($('#spin-x').val() - 5) / 50;
+		var rotateY = ($('#spin-y').val() - 5) / 50;
+		var rotateZ = ($('#spin-z').val() - 5) / 50;
+
+		scene.object.modelMatrix = applyXYZRotationTo(scene.object.modelMatrix, rotateX, rotateY, rotateZ);
+		gl.uniformMatrix4fv(scene.program.modelMatrixUniform, gl.FALSE, scene.object.modelMatrix);
+
+
+
+		//Update the field of view using the slider values
+		var fov = ($('#fov-slider').val());
+		var surface = document.getElementById('rendering-surface');
+		var projectionMatrix = perspective(fov, surface.width/surface.height, 0.1, 100);
+		gl.uniformMatrix4fv(scene.program.projectionMatrixUniform, gl.FALSE, projectionMatrix);
+
+		//Bind and render the buffer containing the triangles tha make up our cube
+		gl.bindBuffer(gl.ARRAY_BUFFER, scene.object.vertexBuffer);
+		gl.drawArrays(gl.TRIANGLES, 0, scene.object.vertexCount);
+		gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+		//Stop using our shaders, and request another frame to be drawn.
+		gl.useProgram(null);
+		requestAnimationFrame(function(time) {
+			render(gl,scene,time,timestamp);
+		});
+	}
+
+	//Initialise WebGL for rendering the given 3D object
+	function init(object) {
+		//The surface and WebGL context
+		var surface = document.getElementById('rendering-surface');
+		var gl = surface.getContext('experimental-webgl');
+
+		//Set up the camera and culling options.
+		gl.viewport(0,0,surface.width,surface.height);
+		gl.enable(gl.DEPTH_TEST);
+		gl.enable(gl.CULL_FACE);
+		gl.cullFace(gl.BACK);
+
+		//Make the background clear colour green.
+		gl.clearColor(0.0, 1.0, 0.0, 1.0);
+
+		//Load and compile our vertex and fragment shaders
+		var program = createProgram(gl,
+			[{container: 'vertex-shader', type: gl.VERTEX_SHADER},
+			{container: 'fragment-shader', type: gl.FRAGMENT_SHADER}]
+		);
+
+		//Start using the program to figure out how to pass arguments to it.
+		gl.useProgram(program);
+
+		//Load the vertices from the object into a buffer
+		//Bind elements of that buffer to the "pos" argument in the vertex shader.
+		program.positionAttribute = gl.getAttribLocation(program, 'pos');
+		gl.enableVertexAttribArray(program.positionAttribute);
+
+		var vertexBuffer = gl.createBuffer();
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, object.vertices, gl.STATIC_DRAW);
+		gl.vertexAttribPointer(program.positionAttribute, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 3, 0);
+
+		//Initialise our transformation matrices, and figure out how to pass
+		//them to our shaders as uniform variables:
+
+		var projectionMatrix = perspective(0.75, surface.width/surface.height, 0.1, 100);
+		program.projectionMatrixUniform = gl.getUniformLocation(program, 'projectionMatrix');
+		gl.uniformMatrix4fv(program.projectionMatrixUniform, gl.FALSE, projectionMatrix);
+
+		var viewMatrix = createMat4();
+		program.viewMatrixUniform = gl.getUniformLocation(program, 'viewMatrix');
+		gl.uniformMatrix4fv(program.viewMatrixUniform, gl.FALSE, viewMatrix);
+
+		//Initialise the model matrix to put the cube at coordinates (0,0,-5) so it appears on screen.
+		var modelMatrix = arrayToMat4(
+			[1, 0, 0, 0,
+			 0, 1, 0, 0,
+			 0, 0, 1, 0,
+			 0, 0, -5, 1]
+		);
+		program.modelMatrixUniform = gl.getUniformLocation(program, 'modelMatrix');
+		gl.uniformMatrix4fv(program.modelMatrixUniform, gl.FALSE, modelMatrix);
+
+		object.modelMatrix = modelMatrix;
+		object.vertexBuffer = vertexBuffer;
+
+		//Clear our binding contexts
+		gl.bindBuffer(gl.ARRAY_BUFFER, null);
+		gl.useProgram(null);
+
+		//A bundle of useful state for rendering
+		var scene = {
+			program: program,
+			object: object,
+			start: Date.now(),
+			projectionMatrix: projectionMatrix,
+			viewMatrix: viewMatrix
+		};
+
+		//Start drawing frames soon
+		requestAnimationFrame(function(timestamp) {
+			render(gl, scene, timestamp, 0);
+		});
+    }
+
+	//Compile and link the specified vertex and fragment shaders,
+	//throwing exceptions if either stage goes wrong.
+	function createProgram(gl, shaderSpecs) {
+		var program = gl.createProgram();
+
+		//Go through all shaders in the list
+		for(var i = 0; i < shaderSpecs.length; i++){
+			var spec = shaderSpecs[i];
+			var shader = gl.createShader(spec.type);
+
+			//Load the source code from the script tags
+			gl.shaderSource(shader, document.getElementById(spec.container).text);
+
+			//Compile the shader and check for errors
+			gl.compileShader(shader);
+			if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+				throw gl.getShaderInfoLog(shader);
+			}
+
+			//Add the shader to the program, and clean up resources
+			gl.attachShader(program, shader);
+			gl.deleteShader(shader);
+		}
+
+		//Link the vertex and fragment shader stages together in the program.
+		//If the stages do not have matching input and output variables, an error is thrown.
+		gl.linkProgram(program);
+		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+			throw gl.getProgramInfoLog(program);
+		}
+		return program;
+	}
+
+	//Load the the .OBJ file asynchronously, and pass the contents
+	//on to the loadMeshData() and init() functions if successful.
+	function loadMesh(filename) {
+		$.ajax({
+			url: filename,
+			dataType: 'text'
+		}).done(function(data) {
+			init(loadMeshData(data));
+		}).fail(function() {
+			alert('Failed to retrieve [' + filename + "]");
+		});
+	}
+
+    </script>
+	</head>
+	<body>
+		<canvas id="rendering-surface" height="500" width="500"></canvas>
+		<form>
+			<div>
+				<label for="cam-x">Move X<input type="range" name="cam-x" id="cam-x" min="-0.03" max="0.03" step="0.001" value="0"></label>
+				<label for="cam-y">Move Y<input type="range" name="cam-y" id="cam-y" min="-0.03" max="0.03" step="0.001" value="0"></label>
+				<label for="cam-z">Move Z<input type="range" name="cam-z" id="cam-z" min="-0.03" max="0.03" step="0.001" value="0"></label>
+			<div>
+				<label for="spin-x">Spin X<input type="range" name="spin-x" id="spin-x" min="0" max="10" value="5"></label>
+				<label for="spin-y">Spin Y<input type="range" name="spin-y" id="spin-y" min="0" max="10" value="5"></label>
+				<label for="spin-z">Spin Z<input type="range" name="spin-z" id="spin-z" min="0" max="10" value="5"></label>
+			</div>
+			</div>
+			<div>
+			<label for="FOV">FOV<input type="range" name="fov-slider" id="fov-slider" min="0.1" max="1.5" step="0.01" value="0.75"></label>
+			</div>
+			<div id="message_area"></div>
+		</form>
+	</body>
+</html>
