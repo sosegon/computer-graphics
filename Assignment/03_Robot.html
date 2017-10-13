@@ -1,0 +1,65 @@
+<!doctype html>
+<meta charset="UTF-8"> 
+<html>
+
+<!-- 
+If running using Google Chrome, open the browser via the command line 
+with the additional flag: –allow-file-access-from-files 
+-->
+
+  <head>
+		<title>Projection (CG Assignment 1)</title>
+	
+		<script type="text/javascript" src="common/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="common/maths_utils.js"></script>
+		<script type="text/javascript" src="common/shaders.js"></script>
+		<script type="text/javascript" src="common/simple_drawing.js"></script>
+		<script type="text/javascript" src="01_projection.js"></script>
+		<script type="text/javascript" src="02_transformations.js"></script>
+		
+		<script type="text/javascript" src="03_robot.js"></script>
+
+		<script type="text/javascript">
+			function initialiseObjectsToRender(){
+				return initRobotSegments();	
+			}
+		</script>
+	</head>
+	<body>
+		<h1>03: Hieararchical Transformations</h1>
+		<canvas id="rendering-surface" height="500" width="500"></canvas>
+		
+		<form>
+			<h2>Robot Settings</h2><br>
+			<div>
+				<label for="move-x">MoveX<input type="range" name="move-x" id="move-x" min="-4" max="4" step="0.01" value="0"></label>
+				<label for="move-y">MoveY<input type="range" name="move-y" id="move-y" min="-4" max="4" step="0.01" value="0"></label>
+				<label for="move-z">MoveZ<input type="range" name="move-z" id="move-z" min="-4" max="4" step="0.01" value="0"></label>
+			</div>
+			<div>
+				<label for="joint0"> Joint 0 <input type="range" name="joint0" id="joint0" min="-3.14" max="3.14" step="0.001" value="0"></label><br>
+				<label for="joint1"> Joint 1 <input type="range" name="joint1" id="joint1" min="-3.14" max="3.14" step="0.001" value="0"></label><br>
+				<label for="joint2"> Joint 2 <input type="range" name="joint2" id="joint2" min="-3.14" max="3.14" step="0.001" value="0"></label><br>
+				<label for="joint3"> Joint 3 <input type="range" name="joint3" id="joint3" min="-3.14" max="3.14" step="0.001" value="0"></label><br>
+			</div>
+			<div>
+				<label for="gripper">Gripper<input type="range" name="gripper" id="gripper" min="0" max="1" step="0.01" value="0"></label>
+			</div>
+		</form>
+		
+		<form>
+			<h2>Camera Settings</h2>
+			<label for="projection"><br><b>Projection Type:</b>
+				<input type="radio" name="projection" id=="perspective" value="perspective" checked>Perspective
+				<input type="radio" name="projection" id=="orthographic" value="orthographic">Orthographic
+			</label><br>
+			<div>
+				<label for="FOV">FOV<input type="range" name="fov-slider" id="fov-slider" min="0.1" max="1.5" step="0.01" value="0.8"></label>
+				<label for="n-slider">Near<input type="range" name="n-slider" id="n-slider" min="0.01" max="1" step="0.01" value="0.7"></label>
+				<label for="f-slider">Far<input type="range" name="f-slider" id="f-slider" min="0.1" max="300" step="1" value="200.0"></label>
+			</div>
+		</form>
+		
+
+	</body>
+</html>
