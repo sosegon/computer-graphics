@@ -1,0 +1,82 @@
+<!doctype html>
+<meta charset="UTF-8"> 
+<html>
+
+<!-- 
+If running using Google Chrome, open the browser via the command line 
+with the additional flag: –allow-file-access-from-files 
+-->
+
+  <head>
+		<title>Projection (CG Assignment 1)</title>
+	
+		<script type="text/javascript" src="common/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="common/maths_utils.js"></script>
+		<script type="text/javascript" src="common/shaders.js"></script>
+		<script type="text/javascript" src="common/simple_drawing.js"></script>
+		<script type="text/javascript" src="01_projection.js"></script>
+		
+		<script type="text/javascript" src="02_transformations.js"></script>
+
+		<script type="text/javascript">
+			function initialiseObjectsToRender(){
+				var pos = [0,0,0];
+				var size = [1, 1, 1];
+				var colour = [0.8, 0.8, 0.1 ];
+				var wireColour = [1.0, 1.0, 1.0];
+				
+				var cube = new Cuboid(pos, size, colour, wireColour);
+				cube.getTransform = function(){
+					var RX = rotateX(parseFloat($('#rot-x').val()));
+					var RY = rotateY(parseFloat($('#rot-y').val()));
+					var RZ = rotateZ(parseFloat($('#rot-z').val()));
+					var R = multiplyMat4(RX, multiplyMat4(RY, RZ));
+					
+					var T = translate(parseFloat($('#move-x').val()), parseFloat($('#move-y').val()), parseFloat($('#move-z').val()));
+					
+					var S = scale(parseFloat($('#scale-x').val()), parseFloat($('#scale-y').val()), parseFloat($('#scale-z').val()));
+					
+					return multiplyMat4(T, multiplyMat4(R, S));
+				}
+				return [cube];
+			}
+		</script>
+	</head>
+	<body>
+		<h1>02: Transformations</h1>
+		<canvas id="rendering-surface" height="500" width="500"></canvas>
+
+		<form>
+			<h2>Transform Settings</h2>
+			<div>
+				<label for="move-x">MoveX<input type="range" name="move-x" id="move-x" min="-4" max="4" step="0.01" value="0"></label>
+				<label for="move-y">MoveY<input type="range" name="move-y" id="move-y" min="-4" max="4" step="0.01" value="0"></label>
+				<label for="move-z">MoveZ<input type="range" name="move-z" id="move-z" min="-8" max="4" step="0.01" value="-2.2"></label>
+			</div>
+			<div>
+				<label for="rot-x">Rotate X<input type="range" name="rot-x" id="rot-x" min="-3.14" max="3.14" step="0.001" value="0.3"></label>
+				<label for="rot-y">Rotate y<input type="range" name="rot-y" id="rot-y" min="-3.14" max="3.14" step="0.001" value="0.785398"></label>
+				<label for="rot-z">Rotate Z<input type="range" name="rot-z" id="rot-z" min="-3.14" max="3.14" step="0.001" value="0"></label>
+			</div>
+			<div>
+				<label for="scale-x">Scale X<input type="range" name="scale-x" id="scale-x" min="-4" max="4" step="0.001" value="1"></label>
+				<label for="scale-y">Scale Y<input type="range" name="scale-y" id="scale-y" min="-4" max="4" step="0.001" value="1"></label>
+				<label for="scale-z">Scale Z<input type="range" name="scale-zs" id="scale-z" min="-4" max="4" step="0.001" value="1"></label>
+			</div>
+		</form>
+		
+		<form>
+			<h2>Camera Settings</h2>
+			<label for="projection"><br><b>Projection Type:</b>
+				<input type="radio" name="projection" id=="perspective" value="perspective" checked>Perspective
+				<input type="radio" name="projection" id=="orthographic" value="orthographic">Orthographic
+			</label><br>
+			<div>
+				<label for="FOV">FOV<input type="range" name="fov-slider" id="fov-slider" min="0.1" max="1.5" step="0.01" value="0.8"></label>
+				<label for="n-slider">Near<input type="range" name="n-slider" id="n-slider" min="0.01" max="1" step="0.01" value="0.7"></label>
+				<label for="f-slider">Far<input type="range" name="f-slider" id="f-slider" min="0.1" max="300" step="1" value="200.0"></label>
+			</div>
+		</form>
+		
+	</body>
+</html>
