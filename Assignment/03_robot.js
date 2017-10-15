@@ -18,17 +18,18 @@ function RobotSegment(parent, localToParentMatrix, shape){
 		//TODO implement this so that it returns the correct hierarchical transformation
 		//matrix using the local "transform", "this.localToParentMatrix", and any
 		//necessary transformations from "this.parent".
-		//var result = createMat4();
+
+		//Sequence is LP * T * LP * T LP * T * ..... * Geometry
 		var currentElement = this;
-		result = localToParentMatrix;
+		result = currentElement.getLocalTransform();
 		while(currentElement !== null && currentElement!== undefined) {
-			result = multiplyMat4(currentElement.getLocalTransform(), result);
+			result = multiplyMat4(currentElement.localToParentMatrix, result);
 
 			var parent = currentElement.parent;
 			if(currentElement.parent === null || currentElement === undefined) {
 				break;
 			}
-			result = multiplyMat4(parent.localToParentMatrix, result);
+			result = multiplyMat4(parent.getLocalTransform(), result);
 			currentElement = parent;
 		}
 		
