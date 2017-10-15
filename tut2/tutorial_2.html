@@ -227,13 +227,10 @@ with the additional flag: –allow-file-access-from-files
 		var R = rotateXYZ(thetaX, thetaY, thetaZ);
 
 		//Change tranform to apply the correct rotation and translations transformations in the right order
-		var transform = createMat4();
+		var transback = translate(-pos[0], -pos[1], -pos[2]);
+    var transforw = translate(pos[0], pos[1], pos[2]);
 
-    var trans = translate(pos[0], pos[1], pos[2]);
-    transform = multiplyMat4(trans, R);
-
-    var transback = translate(-pos[0], -pos[1], -pos[2]);
-    transform = multiplyMat4(transform, transback);
+    var transform = multiplyMat4(transforw, multiplyMat4(R, transback));
 
 		return multiplyMat4(transform, m);
 	}
