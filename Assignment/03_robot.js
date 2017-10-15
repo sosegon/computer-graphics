@@ -19,15 +19,17 @@ function RobotSegment(parent, localToParentMatrix, shape){
 		//matrix using the local "transform", "this.localToParentMatrix", and any
 		//necessary transformations from "this.parent".
 		//var result = createMat4();
-		var currentParent = this.parent;
 		var currentElement = this;
-		result = localToParentMatrix
-		while(currentParent !== null && currentParent !== undefined) {
+		result = localToParentMatrix;
+		while(currentElement !== null && currentElement!== undefined) {
 			result = multiplyMat4(currentElement.getLocalTransform(), result);
-			result = multiplyMat4(currentParent.localToParentMatrix, result);
-			var temp = currentParent;
-			currentElement = currentParent;
-			currentParent = temp.parent;
+
+			var parent = currentElement.parent;
+			if(currentElement.parent === null || currentElement === undefined) {
+				break;
+			}
+			result = multiplyMat4(parent.localToParentMatrix, result);
+			currentElement = parent;
 		}
 		
 		return result;
