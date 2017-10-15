@@ -71,7 +71,26 @@ function addGripper(robotSegments){
 		return createMat4();
 	};
 	robotSegments.push(base_gripper);
-	
+
+	parent = base_gripper;
+	offsetFromParentOriginToJointCentre = parent.shape.dimensions[1];
+	size = [0.2, .4, .4];
+	var scalars = [1, -1];
+	for(var i = 0; i < scalars.length; i++) {
+		var localToParentMatrix = translate(0, offsetFromParentOriginToJointCentre, 0);
+		var gripper_side = new RobotSegment(parent, localToParentMatrix, new Shape([0,  size[1] / 2, 0], size, GREY, GREEN));
+		gripper_side.scalar = scalars[i];
+		gripper_side.getLocalTransform = function(){
+			var maxX = $('#gripper').map(function(){
+				return this.max;
+			}).get()[0];
+			hx = this.shape.dimensions[0] / 2;
+			hpx = this.parent.shape.dimensions[0] / 2;
+			var moveX = hx + ($('#gripper').val()) * (hpx - 2*hx);
+			return translate(this.scalar*moveX, 0, 0);
+		};
+		robotSegments.push(gripper_side);
+	}
 }		
 		
 function initRobotSegments(){
