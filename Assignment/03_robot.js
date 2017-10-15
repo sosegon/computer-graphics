@@ -61,6 +61,16 @@ function addGripper(robotSegments){
 	//make it open and close via the slider. The slider value can be retrieved via:
 	//var closedness = parseFloat($('#gripper').val());
 	//Which returns a closedness variable between 0 and 1
+
+	var parent = robotSegments[robotSegments.length - 1];
+	var offsetFromParentOriginToJointCentre = parent.shape.dimensions[1];
+	var localToParentMatrix = translate(0, offsetFromParentOriginToJointCentre, 0);
+	var size = [1, .2, .4];
+	var base_gripper = new RobotSegment(parent, localToParentMatrix, new Shape([0,  size[1] / 2, 0], size, GREY, GREEN));
+	base_gripper.getLocalTransform = function(){
+		return createMat4();
+	};
+	robotSegments.push(base_gripper);
 	
 }		
 		
