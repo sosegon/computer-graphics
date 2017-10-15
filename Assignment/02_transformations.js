@@ -7,25 +7,64 @@
 	
 	//Return a translation matrix
 	function translate(x, y, z) {
-		return createMat4();
+		var t = [
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			x, y, z, 1
+		];
+		return arrayToMat4(t);
 	}	
 
 	//Return a scale matrix
 	function scale(x, y, z) {
-		return createMat4();
+		var s = [
+			x, 0, 0, 0,
+			0, y, 0, 0,
+			0, 0, z, 0,
+			0, 0, 0, 1
+		];
+		return arrayToMat4(s);
 	}
 	
 	//Rotation matrixes for different axes:
 	
 	function rotateX(theta) {
-		return createMat4();
+		var s = Math.sin(theta);
+		var c = Math.cos(theta);
+
+		var r = [
+			1, 0, 0, 0,
+			0, c, s, 0,
+			0, -s, c, 0,
+			0, 0, 0, 1
+		];
+		return arrayToMat4(r);
 	}
 	
 	function rotateY(theta) {
-		return createMat4();
+		var s = Math.sin(theta);
+		var c = Math.cos(theta);
+
+		var r = [
+			c, 0, -s, 0,
+			0, 1, 0, 0,
+			s, 0, c, 0,
+			0, 0, 0, 1
+		];
+		return arrayToMat4(r);
 	}
 	
 	function rotateZ(theta) {
-		return createMat4();
+		var s = Math.sin(theta);
+		var c = Math.cos(theta);
+
+		var r = [
+			c, s, 0, 0,
+			-s, c, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		];
+		return arrayToMat4(r);
 	}
 	
