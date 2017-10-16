@@ -1,20 +1,20 @@
 //////////////////////////////////////////////////////////////
 /////                Hierarchical Robot Segments
 //////////////////////////////////////////////////////////////
-	
+
 function RobotSegment(parent, localToParentMatrix, shape){
 	this.parent = parent;
 	this.localToParentMatrix = localToParentMatrix;
-	
+
 	this.shape = shape;
-	
+
 	this.getLocalTransform = function(){
 		return createMat4();
 	}
-	
+
 	this.getLocalToGlobalMatrix = function(){
 		var transform = this.getLocalTransform();
-		
+
 		//TODO implement this so that it returns the correct hierarchical transformation
 		//matrix using the local "transform", "this.localToParentMatrix", and any
 		//necessary transformations from "this.parent".
@@ -32,10 +32,10 @@ function RobotSegment(parent, localToParentMatrix, shape){
 			result = multiplyMat4(parent.getLocalTransform(), result);
 			currentElement = parent;
 		}
-		
+
 		return result;
 	}
-	
+
 	this.render = function(gl, scene, projectionMatrix){
 		var localToGlobalMatrix = this.getLocalToGlobalMatrix();
 		renderCuboid(gl, scene, projectionMatrix, localToGlobalMatrix, this.shape);
@@ -45,18 +45,18 @@ function RobotSegment(parent, localToParentMatrix, shape){
 
 //////////////////////////////////////////////////////////////
 /////  Initialising all Robot Segments (add missing gripper)
-//////////////////////////////////////////////////////////////	
-		
+//////////////////////////////////////////////////////////////
+
 var GREY = [0.3, 0.3, 0.3];
-var GREEN = [0, 1, 0];		
-		
+var GREEN = [0, 1, 0];
+
 function addGripper(robotSegments){
 
 	//TODO implement this to add a gripper to the end of the robot arm
 	//Add any new segments to the  "robotSegments" array
 	//The end current of the arm is robotSegments[4], whose size can be accessed via robotSegments[4].shape.dimensions
 	//Examples of adding and creating segments can be seen in the initRobotSegments() function below
-	
+
 	//Also, overwrite the getLocalTransform() functions on any new gripper segments necessary to
 	//make it open and close via the slider. The slider value can be retrieved via:
 	//var closedness = parseFloat($('#gripper').val());
@@ -86,16 +86,16 @@ function addGripper(robotSegments){
 			}).get()[0];
 			hx = this.shape.dimensions[0] / 2;
 			hpx = this.parent.shape.dimensions[0] / 2;
-			var moveX = hx + ($('#gripper').val()) * (hpx - 2*hx);
+			var moveX = hpx  - hx - ($('#gripper').val()) * (hpx - 2*hx);
 			return translate(this.scalar*moveX, 0, 0);
 		};
 		robotSegments.push(gripper_side);
 	}
-}		
-		
+}
+
 function initRobotSegments(){
 	var robotSegments = []
-		
+
 	sizes = [
 		[2.0, 0.2, 2.0],
 		[1.0, 0.2, 1.0],
@@ -109,19 +109,19 @@ function initRobotSegments(){
 	for(var i = 0; i < sizes.length; i++){
 		let joint = new RobotSegment(parent, localToParentMatrix, new Shape([0, sizes[i][1] / 2, 0], sizes[i], GREY, GREEN));
 		robotSegments.push(joint);
-		
+
 		parent = joint;
 		var offsetFromParentOriginToJointCentre = (sizes[i][1]);
 		var localToParentMatrix = translate(0, offsetFromParentOriginToJointCentre, 0);
 	}
-	
+
 	robotSegments[0].getLocalTransform = function(){
 		var moveX = ($('#move-x').val());
 		var moveY = ($('#move-y').val());
 		var moveZ = ($('#move-z').val());
 		return translate(moveX, moveY, moveZ);
 	}
-	
+
 	robotSegments[1].getLocalTransform = function(){
 		var theta = ($('#joint0').val());
 		return rotateY(theta);
@@ -143,5 +143,3 @@ function initRobotSegments(){
 
 	return robotSegments;
 }
-
-
