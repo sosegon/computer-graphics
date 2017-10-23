@@ -1,0 +1,36 @@
+<!doctype html>
+<meta charset="UTF-8"> 
+<html>
+
+<!-- 
+If running using Google Chrome, open the browser via the command line 
+with the additional flag: –allow-file-access-from-files 
+-->
+
+  <head>
+		<title>Projection (CG Assignment 1)</title>
+	
+		<script type="text/javascript" src="common/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="common/maths_utils.js"></script>
+		
+		<script type="text/javascript" src="common/simple_drawing.js"></script>
+		<script type="text/javascript" src="common/texturing.js"></script>
+		
+		<!-- Files you need to edit -->
+		<script type="text/javascript" src="load_obj.js"></script>
+		<script type="text/javascript" src="shaders.js"></script>
+
+		<script type="text/javascript">
+			function initialiseObjectsToRender(){
+				var pos = [0,0,-1.5];
+				var size = [1, 1, 1];
+				var model = new Model(pos, size);
+				return [model];
+			}
+		</script>
+	</head>
+	<body>
+		<h1></h1>
+		<canvas id="rendering-surface" height="500" width="500"></canvas>
+	</body>
+</html>
