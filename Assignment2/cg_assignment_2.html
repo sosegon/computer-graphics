@@ -1,0 +1,100 @@
+<!doctype html>
+<meta charset="UTF-8"> 
+<html>
+
+<!-- 
+If running using Google Chrome, open the browser via the command line 
+with the additional flag: –allow-file-access-from-files 
+-->
+
+  <head>
+		<title>CG Assignment 2</title>
+	
+		<script type="text/javascript" src="common/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="common/maths_utils.js"></script>
+		
+		<script type="text/javascript" src="common/simple_drawing.js"></script>
+		<script type="text/javascript" src="common/texturing.js"></script>
+		<script type="text/javascript" src="common/transformations.js"></script>
+		
+		<!-- Files you need to edit -->
+		<script type="text/javascript" src="01_load_obj.js"></script>
+		<script type="text/javascript" src="02_subdiv.js"></script>
+		<script type="text/javascript" src="03_render.js"></script>
+		<script type="text/javascript" src="shaders.js"></script>
+
+		<script type="text/javascript">
+			function initialiseObjectsToRender(){
+				var pos = [0,0,0];
+				var size = [1, 1, 1];
+				var model = new Model(pos, size);
+				
+
+				model.getTransform = function(){
+					var RX = rotateX(parseFloat($('#rot-x').val()));
+					var RY = rotateY(parseFloat($('#rot-y').val()));
+					var RZ = rotateZ(parseFloat($('#rot-z').val()));
+					var R = multiplyMat4(RX, multiplyMat4(RY, RZ));
+					
+					var T = translate(parseFloat($('#move-x').val()), parseFloat($('#move-y').val()), parseFloat($('#move-z').val()));
+										
+					return multiplyMat4(T, R);
+				}
+				
+				return [model];
+			}
+		</script>
+	</head>
+	<body>
+		<canvas id="rendering-surface" height="500" width="500"></canvas>
+		<form>
+			
+			<table>
+				<tr><b><u>Subdivision</u></b></tr>
+				<tr>
+					<td>Draw Wireframe</td>
+					<td><input type="checkbox" id="wireframe_on" checked>
+				</tr>
+				<tr>
+					<td>Subdivision</td>
+					
+					<td><input type="range" id="subdiv" min="0" max="2" step="1" value="0" oninput="subdiv_output.value = subdiv.value"></td>
+					<td><output name="subdiv_output" id="subdiv-output">0</output></td>
+				</tr>
+				<tr>
+					<td>&#945;</td>
+					<td><input type="range" id="subdiv_alpha" min="0" max="0.5" step="0.01" value="0.01" oninput="subdiv_alpha_output.value = subdiv_alpha.value"></td>
+					<td><output name="subdiv_alpha_output" id="subdiv_alpha_output">0.01</output></td>
+				</tr>
+			</table>
+			<table>
+				<tr><b><u>Lighting</u></b></tr>
+				<tr>
+					<td>Shininess</td>
+					<td><input type="range" id="shininess" min="0.1" max="50" step="0.01" value="10" oninput="shininess_output.value = shininess.value"></td>
+					<td><output id="shininess_output">10</output></td>
+				</tr>
+				<tr>
+					<td>Normal Map Scale</td>
+					<td><input type="range" id="normal_map_scale" min="0" max="1.0" step="0.01" value="0.4" oninput="normal_map_scale_output.value = normal_map_scale.value"></td>
+					<td><output name="normal_map_scale_output" id="normal_map_scale_output">0.4</output></td>
+				</tr>
+			</table>
+			<table>
+				<tr><td><b><u>Transform</u></b></td></tr>
+				<tr>
+					<td>Move</td>
+					<td>X</td><td><input type="range" name="move-x" id="move-x" min="-4" max="4" step="0.01" value="0"></td>
+					<td>Y</td><td><input type="range" name="move-y" id="move-y" min="-4" max="4" step="0.01" value="0"></td>
+					<td>Z</td><td><input type="range" name="move-z" id="move-z" min="-8" max="4" step="0.01" value="-4"></td>
+				</tr>
+				<tr>
+					<td>Rotate</td>
+					<td>X</td><td><input type="range" name="rot-x" id="rot-x" min="-3.14" max="3.14" step="0.001" value="0.0"></td>
+					<td>Y</td><td><input type="range" name="rot-y" id="rot-y" min="-3.14" max="3.14" step="0.001" value="0.0"></td>
+					<td>Z</td><td><input type="range" name="rot-z" id="rot-z" min="-3.14" max="3.14" step="0.001" value="0.0"></td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>
