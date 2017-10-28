@@ -11,7 +11,8 @@ function renderMonkey(gl, scene, modelMatrix, projectionMatrix){
 	var shininessVal = parseFloat($('#shininess').val());
 
 	//TODO: pass in shininessVal to the fragment shader's uniform variable 'shininess' here:
-	
+	var shininessLoc = gl.getUniformLocation(scene.program, "shininess");
+	gl.uniform1f(shininessLoc, shininessVal)
 	
 	
 	

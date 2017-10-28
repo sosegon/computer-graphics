@@ -21,7 +21,7 @@ var vertexShaderSource = `#version 300 es
 
 	
 	//TODO: Add new output variables here for texture uvs and vertex normals
-	
+	out vec3 vertexNormal;
 	
 	out vec3 eyeVec;
 	out vec3 lightVec;
@@ -59,7 +59,7 @@ var vertexShaderSource = `#version 300 es
 		
 		//TODO: set up the normal vector and texture uvs to pass to the fragment shader here:
 		//You will need to add new in/out variables in both shaders for this.
-		
+		vertexNormal = vertNormal;
 		
 		vec4 vGlobal = modelMatrix * pos;
 
@@ -83,7 +83,7 @@ var fragmentShaderSource = `#version 300 es
 	
 	
 	//TODO: add new input variables matching those from the vertex shader to receive the normal and texture uv coordinates
-	
+	in vec3 vertexNormal;
 	
 	in vec3 eyeVec;
 	in vec3 lightVec;
@@ -132,7 +132,7 @@ var fragmentShaderSource = `#version 300 es
 	//TODO change this to a uniform variable instead of a const after you have implemented code to 
 	//initialise its value in 03_render.js
 	
-	const float shininess = 10.0;
+	uniform float shininess;
 	
 	
 	
@@ -146,10 +146,19 @@ var fragmentShaderSource = `#version 300 es
 	
 	
 		//TODO: implement phong illumination here to return more than just materialAmbient:
+		vec3 eye_vec = normalize(eyeVec);
+		vec3 light_vec = normalize(lightVec);
+		
+		vec3 H = light_vec + eye_vec;
+		vec3 h = normalize(H);
+
+		vec3 amb = materialDiffuse*(lightAmbient + lightIntensity*max(0.0, dot(vertexNormal, light_vec)));
+		vec3 phong = materialSpecular*lightIntensity*pow(dot(h, vertexNormal), shininess);
+
+		vec3 outt = amb + phong;
+		vec3 outCol = vec3(clamp(outt, 0.0, 1.0));
 	
-	
-	
-		fragColor = vec4(materialAmbient, 1.0);
+		fragColor = vec4(outCol, 1.0);
 	}
 `;
 
