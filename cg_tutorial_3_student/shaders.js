@@ -22,7 +22,8 @@ var vertexShaderSource = `#version 300 es
 	//The colour for this vertex. By default, colours will be
 	//smoothly interpolated. Add the word "flat" in front of "out" here and
 	//in the fragment shader to do flat shading.
-	flat out vec3 outCol;
+	//flat out vec3 outCol;
+	out vec3 outCol; // Remove flat to get Gouraud Shading
 
 	
 	//##########################################
@@ -125,7 +126,8 @@ var vertexShaderSource = `#version 300 es
 var fragmentShaderSource = `#version 300 es
 	precision mediump float;
 
-	flat in vec3 outCol;
+	//flat in vec3 outCol;
+	in vec3 outCol; // Remove flat to get Gouraud Shading
 	
 	out vec4 fragColor;
 
