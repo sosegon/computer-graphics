@@ -22,6 +22,7 @@ var vertexShaderSource = `#version 300 es
 	
 	//TODO: Add new output variables here for texture uvs and vertex normals
 	out vec3 vertexNormal;
+	out vec2 vertexUV;
 	
 	out vec3 eyeVec;
 	out vec3 lightVec;
@@ -60,6 +61,7 @@ var vertexShaderSource = `#version 300 es
 		//TODO: set up the normal vector and texture uvs to pass to the fragment shader here:
 		//You will need to add new in/out variables in both shaders for this.
 		vertexNormal = vertNormal;
+		vertexUV = vertUV;
 		
 		vec4 vGlobal = modelMatrix * pos;
 
@@ -84,6 +86,7 @@ var fragmentShaderSource = `#version 300 es
 	
 	//TODO: add new input variables matching those from the vertex shader to receive the normal and texture uv coordinates
 	in vec3 vertexNormal;
+	in vec2 vertexUV;
 	
 	in vec3 eyeVec;
 	in vec3 lightVec;
@@ -143,6 +146,10 @@ var fragmentShaderSource = `#version 300 es
 	//Output the colour as an RGBA vector with full alpha
 	void main() {
 
+		vec4 tex = texture(normalMapTexture, vertexUV) * displacementScale;
+		vec3 ttex = vec3(tex.x, tex.y, tex.z);
+		vec3 newN = vertexNormal + ttex;
+		vec3 n = normalize(newN);
 	
 	
 		//TODO: implement phong illumination here to return more than just materialAmbient:
@@ -153,7 +160,7 @@ var fragmentShaderSource = `#version 300 es
 		vec3 h = normalize(H);
 
 		vec3 amb = materialDiffuse*(lightAmbient + lightIntensity*max(0.0, dot(vertexNormal, light_vec)));
-		vec3 phong = materialSpecular*lightIntensity*pow(dot(h, vertexNormal), shininess);
+		vec3 phong = materialSpecular*lightIntensity*pow(dot(h, n), shininess);
 
 		vec3 outt = amb + phong;
 		vec3 outCol = vec3(clamp(outt, 0.0, 1.0));
