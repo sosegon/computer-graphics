@@ -22,7 +22,8 @@ var vertexShaderSource = `#version 300 es
 	//The colour for this vertex. By default, colours will be
 	//smoothly interpolated. Add the word "flat" in front of "out" here and
 	//in the fragment shader to do flat shading.
-	flat out vec3 outCol;
+	//flat out vec3 outCol;
+	out vec3 outCol; // Remove flat to get Gouraud Shading
 
 	
 	//##########################################
@@ -53,7 +54,7 @@ var vertexShaderSource = `#version 300 es
 	const vec4 eyePos = vec4(0.0);
 	
 	//Homogeneous coordinate of light source  (in world coordinates).
-	const vec4 lightPos = vec4(1.0, 0.0, 0.0, 1.0);
+	const vec4 lightPos = vec4(0.3, 0.0, 1.0, 1.0);
 
 	//The single point light's intensity (split into rgb channels to give it a configurable colour).
 	const vec3 lightIntensity = vec3(0.8);
@@ -77,7 +78,7 @@ var vertexShaderSource = `#version 300 es
 	//The exponent in the phong specularity calculation.
 	//Smoother, more mirror-like surfaces should have higher values, 
 	//which will reduce the size of the specular highlight.
-	const float shininess = 10.0;
+	const float shininess = 50.0;
 
 	
 	//##########################################
@@ -88,8 +89,10 @@ var vertexShaderSource = `#version 300 es
 	void main() {
 		
 		//TODO: Add displacement mapping to pos:
-
-		vec4 pos = vec4(vertPos, 1.0);
+		vec4 col = texture(displacementMapTexture, vertUV);
+		float delta = col[0] * displacementScale;
+		vec3 newPos = vertPos + (vertNormal * delta);
+		vec4 pos = vec4(newPos, 1.0);
 
 		
 		
@@ -98,8 +101,20 @@ var vertexShaderSource = `#version 300 es
 		vec3 n = normalize((transpose(inverse(mat3(modelMatrix))) * vertNormal));
 		
 		//TODO: Add phong illumination here, and set outCol to the result instead of materialAmbient
+		vec3 eye_pos = vec3(eyePos.x, eyePos.y, eyePos.z);
+		vec3 Light_pos = vec3(lightPos.x, lightPos.y, lightPos.z);
 
-		outCol = materialAmbient;
+		vec3 light_pos = normalize(Light_pos);
+
+		vec3 H = light_pos + eye_pos;
+		vec3 h = normalize(H);
+
+		vec3 amb = materialDiffuse*(lightAmbient + materialAmbient*max(0.0, dot(n, light_pos)));
+		vec3 phong = materialSpecular*materialAmbient*pow(dot(h, n), shininess);
+
+		vec3 outt = amb + phong;
+		outCol = vec3(clamp(outt, 0.0, 1.0));
+		//outCol = materialAmbient;
 
 
 		//Project the final position into global space, then camera space, then projected space
@@ -111,7 +126,8 @@ var vertexShaderSource = `#version 300 es
 var fragmentShaderSource = `#version 300 es
 	precision mediump float;
 
-	flat in vec3 outCol;
+	//flat in vec3 outCol;
+	in vec3 outCol; // Remove flat to get Gouraud Shading
 	
 	out vec4 fragColor;
 

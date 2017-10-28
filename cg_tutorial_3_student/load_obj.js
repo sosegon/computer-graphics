@@ -37,7 +37,6 @@ function loadMeshData(string) {
 						var pos = temp_positions[parseInt(face_elem[0]) - 1];
 						var uvs = temp_uvs[parseInt(face_elem[1]) - 1];
 						var nor = temp_normals[parseInt(face_elem[2]) - 1];
-//debugger;
 						for(var j = 0; j < pos.length; j++){
 							vertexBuffer.push(pos[j])
 						}
@@ -53,7 +52,7 @@ function loadMeshData(string) {
 					break;
 			}
 		}
-	}debugger;
+	}
 	var elementsPerVertex = 3 + 2 + 3;
 	return {
 		vertexBuffer: new Float32Array(vertexBuffer),
