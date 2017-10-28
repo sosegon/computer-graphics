@@ -52,7 +52,7 @@ function loadMeshData(string) {
 					break;
 			}
 		}
-	}debugger;
+	}
 	var elementsPerVertex = 3 + 2 + 3;
 	return {
 		vertexBuffer: new Float32Array(vertexBuffer),

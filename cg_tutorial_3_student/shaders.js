@@ -88,8 +88,10 @@ var vertexShaderSource = `#version 300 es
 	void main() {
 		
 		//TODO: Add displacement mapping to pos:
-
-		vec4 pos = vec4(vertPos, 1.0);
+		vec4 col = texture(displacementMapTexture, vertUV);
+		float delta = col[0] * displacementScale;
+		vec3 newPos = vertPos + (vertNormal * delta);
+		vec4 pos = vec4(newPos, 1.0);
 
 		
 		
