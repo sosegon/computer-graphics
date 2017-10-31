@@ -146,9 +146,10 @@ var fragmentShaderSource = `#version 300 es
 	//Output the colour as an RGBA vector with full alpha
 	void main() {
 
-		vec4 tex = texture(normalMapTexture, vertexUV) * displacementScale;
-		vec3 ttex = vec3(tex.x, tex.y, tex.z);
-		vec3 newN = vertexNormal + ttex;
+		vec4 tex = texture(normalMapTexture, vertexUV);
+		vec3 vectorDisp = vec3(tex.x, tex.y, tex.z) * 2.0 - vec3(1, 1, 1); // from -1 to 1
+		vec3 vectorDispSca = vectorDisp * displacementScale;
+		vec3 newN = vertexNormal + vectorDispSca;
 		vec3 n = normalize(newN);
 	
 	
