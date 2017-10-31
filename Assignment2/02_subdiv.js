@@ -16,10 +16,18 @@ function subdivideMesh(originalVerexData, numSubdivisions, alpha) {
 			var vertex1Data = originalVerexData.slice(counter + 8, counter + 16);
 			var vertex2Data = originalVerexData.slice(counter + 16, counter + 24);
 
-			var vertex01Data = generateVertexData(vertex0Data, vertex1Data);
-			var vertex12Data = generateVertexData(vertex1Data, vertex2Data);
-			var vertex02Data = generateVertexData(vertex2Data, vertex0Data);
-			
+			var vertex01Data = generateVertexData(vertex0Data, vertex1Data, alpha);
+			var vertex12Data = generateVertexData(vertex1Data, vertex2Data, alpha);
+			var vertex02Data = generateVertexData(vertex2Data, vertex0Data, alpha);
+
+			// Apply alpha displacement
+			vertex0Data = displaceVertex(vertex0Data, alpha); 
+			vertex1Data = displaceVertex(vertex1Data, alpha); 
+			vertex2Data = displaceVertex(vertex2Data, alpha); 
+			vertex01Data = displaceVertex(vertex01Data, alpha);
+			vertex12Data = displaceVertex(vertex12Data, alpha);
+			vertex02Data = displaceVertex(vertex02Data, alpha);
+
 			var allData = [
 				vertex0Data, vertex01Data, vertex02Data,
 				vertex01Data, vertex1Data, vertex12Data,
@@ -66,4 +74,30 @@ function generateVertexData(data1, data2) {
 	];
 
 	return data;
+}
+
+function displaceVertex(data, alpha) {
+	var nt = [
+		data[5],
+		data[6],
+		data[7]
+	];
+
+	var nt_mag = Math.sqrt(nt[0] * nt[0] + nt[1] * nt[1] + nt[2] * nt[2]);
+	displ_vector = [
+		alpha * nt[0] / nt_mag, 
+		alpha * nt[1] / nt_mag, 
+		alpha * nt[2] / nt_mag
+	];
+
+	return [
+		data[0] + displ_vector[0],
+		data[1] + displ_vector[1],
+		data[2] + displ_vector[2],
+		data[3],
+		data[4],
+		data[5],
+		data[6],
+		data[7]
+	];
 }
