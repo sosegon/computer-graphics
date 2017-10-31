@@ -21,12 +21,14 @@ function subdivideMesh(originalVerexData, numSubdivisions, alpha) {
 			var vertex02Data = generateVertexData(vertex2Data, vertex0Data, alpha);
 
 			// Apply alpha displacement
-			vertex0Data = displaceVertex(vertex0Data, alpha); 
-			vertex1Data = displaceVertex(vertex1Data, alpha); 
-			vertex2Data = displaceVertex(vertex2Data, alpha); 
-			vertex01Data = displaceVertex(vertex01Data, alpha);
-			vertex12Data = displaceVertex(vertex12Data, alpha);
-			vertex02Data = displaceVertex(vertex02Data, alpha);
+			if(alpha !== 0 && numSubdivisions === 1) {
+				vertex0Data = displaceVertex(vertex0Data, alpha); 
+				vertex1Data = displaceVertex(vertex1Data, alpha); 
+				vertex2Data = displaceVertex(vertex2Data, alpha); 
+				vertex01Data = displaceVertex(vertex01Data, alpha);
+				vertex12Data = displaceVertex(vertex12Data, alpha);
+				vertex02Data = displaceVertex(vertex02Data, alpha);
+			}
 
 			var allData = [
 				vertex0Data, vertex01Data, vertex02Data,
@@ -42,9 +44,7 @@ function subdivideMesh(originalVerexData, numSubdivisions, alpha) {
 			counter = counter + 24;
 		}
 		
-		//TODO: Implement subdivision here:
-		
-		return newVertexData;
+		return subdivideMesh(newVertexData, numSubdivisions - 1, alpha);
 	}
 }
 
@@ -59,8 +59,9 @@ function generateVertexData(data1, data2) {
 	// vectors 1 and 2. It is not normalized, to mantain the
 	// illumination in the model. Remember that the fragment
 	// shader is doing the interpolation for us, that means,
-	// it calculates the normals automatically. Those normals
-	// are not normalized to get the smooth effect.
+	// it calculates the normals automatically. Those calculated
+	// normals are not normalized to get the smooth effect; we
+	// want the same effect when subdividing the mesh
 	nt = [nt[0] / mnt, nt[1] / mnt, nt[2] / mnt];
 	var data = [
 		(data1[0] + data2[0]) / 2,
