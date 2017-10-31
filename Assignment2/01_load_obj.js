@@ -21,7 +21,6 @@ function loadMeshData(string) {
 		var tokens = lines[i].trim().split(' ');
 		if(tokens.length > 0){
 			switch(tokens[0]){
-				//TODO: Fill this in to load the .obj file into vertexBuffer with positions, texture uvs, and normals
 				case 'v':
 					temp_positions.push([parseFloat(tokens[1]), parseFloat(tokens[2]), parseFloat(tokens[3])]);
 					break;

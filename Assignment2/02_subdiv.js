@@ -30,11 +30,14 @@ function subdivideMesh(originalVerexData, numSubdivisions, alpha) {
 				vertex02Data = displaceVertex(vertex02Data, alpha);
 			}
 
+			// Generate the new triangles
 			var allData = [
 				vertex0Data, vertex01Data, vertex02Data,
 				vertex01Data, vertex1Data, vertex12Data,
 				vertex12Data, vertex2Data, vertex02Data,
 				vertex01Data, vertex12Data, vertex02Data];
+
+			// Add the new data to the new buffer
 			for(var i = 0; i < allData.length; i++){
 				currentData = allData[i];
 				for(var j = 0; j < currentData.length; j++) {
